@@ -19,7 +19,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const validAnswers = ['kucing', 'cat', 'cqr', 'neko'];
+  const validAnswers = ['kucing', 'cat', 'cq'];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

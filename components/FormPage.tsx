@@ -1,66 +1,61 @@
 
 import React, { useState } from 'react';
-import { formatAnswersForEmail } from '../services/geminiService';
 
 const FormPage: React.FC = () => {
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Form state
   const [rating, setRating] = useState(5);
   const [bestActivity, setBestActivity] = useState('');
   const [worstActivity, setWorstActivity] = useState('');
   const [fulfilledExpectation, setFulfilledExpectation] = useState('');
   const [wishes, setWishes] = useState('');
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [formattedResult, setFormattedResult] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-    setFormattedResult(null);
-
-    const formData = {
-      rating,
-      bestActivity,
-      worstActivity,
-      fulfilledExpectation,
-      wishes,
-    };
-
-    try {
-      const result = await formatAnswersForEmail(formData);
-      setFormattedResult(result);
-    } catch (err) {
-      setError('Oops! Something went wrong while preparing your answers. Please try again.');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+    setIsSubmitted(true);
+  };
+  
+  const handleReset = () => {
+    setIsSubmitted(false);
+    setRating(5);
+    setBestActivity('');
+    setWorstActivity('');
+    setFulfilledExpectation('');
+    setWishes('');
   };
 
-  const handleCopyToClipboard = () => {
-    if (formattedResult) {
-      navigator.clipboard.writeText(formattedResult);
-      alert('Copied to clipboard!');
-    }
-  };
+  const SummaryItem: React.FC<{ question: string; answer: string | number }> = ({ question, answer }) => (
+    <div>
+        <h3 className="text-lg font-semibold text-gray-700">{question}</h3>
+        <p className="mt-2 p-3 bg-teal-50 rounded-lg text-gray-800 whitespace-pre-wrap">{answer || 'No answer provided.'}</p>
+    </div>
+  );
 
-  if (formattedResult) {
+  if (isSubmitted) {
     return (
       <div className="w-full max-w-2xl mx-auto bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl shadow-teal-200/50 p-8">
-        <h2 className="text-3xl font-bold text-center text-teal-600 font-pacifico">Answers Prepared!</h2>
-        <div className="mt-6 p-4 bg-gray-100 rounded-lg whitespace-pre-wrap font-mono text-sm border border-gray-200">
-          {formattedResult}
+        <h1 className="font-pacifico text-4xl text-center text-teal-600 mb-2">Thank You!</h1>
+        <p className="text-center text-gray-600 mb-8">Your response has been recorded.</p>
+        
+        <div className="space-y-6 text-left">
+            <SummaryItem question="1. On a scale of 1-10, berapa rating kita main collectively?" answer={rating} />
+            <SummaryItem question="2. What is the best activity that we did?" answer={bestActivity} />
+            <SummaryItem question="3. What is the WORST activity we did?" answer={worstActivity} />
+            <SummaryItem question="4. What is something that fulfilled your expectation based on our meetup thingy?" answer={fulfilledExpectation} />
+            <SummaryItem question="5. What are the things you wish would happen?" answer={wishes} />
         </div>
+
         <button
-          onClick={handleCopyToClipboard}
-          className="w-full mt-6 bg-teal-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-600 transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+          onClick={handleReset}
+          className="w-full mt-8 bg-teal-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-600 transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
         >
-          Copy to Clipboard
+          Submit another response
         </button>
       </div>
     );
   }
+
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl shadow-teal-200/50 p-8">
@@ -129,25 +124,12 @@ const FormPage: React.FC = () => {
             placeholder="Next time, it would be cool if..."
           />
         </div>
-
-        {error && <p className="text-red-500 font-bold text-center">{error}</p>}
         
         <button
           type="submit"
-          disabled={isLoading}
-          className="w-full bg-teal-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-600 transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full bg-teal-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-600 transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
         >
-          {isLoading ? (
-            <>
-              <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Preparing...
-            </>
-          ) : (
-            'Submit Answers'
-          )}
+          Submit Answers
         </button>
       </form>
     </div>

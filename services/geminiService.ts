@@ -1,9 +1,9 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 export interface FormData {
   rating: number;
   bestActivity: string;
+
   worstActivity: string;
   fulfilledExpectation: string;
   wishes: string;
@@ -41,7 +41,7 @@ export const formatAnswersForEmail = async (data: FormData): Promise<string> => 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: [{ parts: [{ text: prompt }] }],
+      contents: prompt,
     });
     
     return response.text;
